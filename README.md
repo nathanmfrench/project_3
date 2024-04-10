@@ -29,10 +29,10 @@ Apply `verifyMIS` locally with the parameter combinations listed in the table be
 | ----------------------- | ---------------------------- | ---------- |
 | small_edges.csv         | small_edges_MIS.csv          | Yes        |
 | small_edges.csv         | small_edges_non_MIS.csv      | No         |
-| line_100_edges.csv      | line_100_MIS_test_1.csv      | ?          |
-| line_100_edges.csv      | line_100_MIS_test_2.csv      | ?          |
-| twitter_10000_edges.csv | twitter_10000_MIS_test_1.csv | ?          |
-| twitter_10000_edges.csv | twitter_10000_MIS_test_2.csv | ?          |
+| line_100_edges.csv      | line_100_MIS_test_1.csv      | Yes        |
+| line_100_edges.csv      | line_100_MIS_test_2.csv      | No         |
+| twitter_10000_edges.csv | twitter_10000_MIS_test_1.csv | No         |
+| twitter_10000_edges.csv | twitter_10000_MIS_test_2.csv | Yes        |
 
 2. **(3 points)** Implement the `LubyMIS` function. The function accepts a Graph[Int, Int] object as its input. You can ignore the two integers associated with the vertex RDD and the edge RDD as they are dummy fields. `LubyMIS` should return a Graph[Int, Int] object such that the integer in a vertex's data field denotes whether or not the vertex is in the MIS, with 1 signifying membership and -1 signifying non-membership. The output will be written as a CSV file to the output path you provide. To execute the function, run the following:
 ```
