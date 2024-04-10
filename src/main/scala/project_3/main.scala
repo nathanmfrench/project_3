@@ -24,7 +24,40 @@ object main{
 
 
   def verifyMIS(g_in: Graph[Int, Int]): Boolean = {
-    // To Implement
+    // Preprocessing step
+    if (g_in.vertices.filter { case (_, x) => x == 1 || x == -1 }.count() < g_in.vertices.count()) {
+      println("Failed First Test")
+      return false
+    }
+
+    // Aggregate messages to find the max and min labels of neighbors
+    val messages = g_in.aggregateMessages[(Int, Int)](
+      triplet => {
+        triplet.sendToDst(triplet.srcAttr, triplet.srcAttr)
+        triplet.sendToSrc(triplet.dstAttr, triplet.dstAttr)
+      },
+      (a, b) => (math.max(a._1, b._1), math.min(a._2, b._2))
+    )
+
+    // Join the vertices with the aggregated messages to check conditions
+    val joined = g_in.outerJoinVertices(messages) {
+      case (_, self, maxMinOption) =>
+        val maxMin = maxMinOption.getOrElse((-1, -1))
+        if (self == 1) {
+          if (maxMin._1 == -1) 1 else 0
+        } else {
+          if (maxMin._1 == 1) 1 else 0
+        }
+    }
+
+    // Check if there are any vertices labeled incorrectly according to the MIS rules
+    val ans = if (joined.vertices.filter { case (_, x) => x == 0 }.count() >= 1) {
+      return false
+    } else {
+      return true
+    }
+
+    return ans
   }
 
 
