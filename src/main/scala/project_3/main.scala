@@ -66,7 +66,7 @@ object main{
       .map { case (id, vp) => (id, if (vp.inMIS == "Yes") 1 else -1) }
       .cache() // Make sure it's materialized and cached before usage
 
-    // Use join to combine the properties instead of lookup inside mapVertices
+    // Use join to combine the properties
     val finalGraph = g_in.outerJoinVertices(finalVertices) {
       case (id, _, optProp) => optProp.getOrElse(-1)
     }
@@ -158,9 +158,9 @@ object main{
 
       val ans = verifyMIS(g)
       if(ans)
-        println("YES the graph is an MIS AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+        println("YES the graph is an MIS")
       else
-        println("NO the graph is not an MIS AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
+        println("NO the graph is not an MIS")
     }
     else
     {
