@@ -80,6 +80,7 @@ b. Run `LubyMIS` on `twitter_original_edges.csv` with 4x2 cores and then 2x2 cor
 | ---------------------------------- | -------------- | --------- |
 | twitter_original_edges.csv         |       1        |    600s   |
 
+With more cores, the answer should be computed faster since there are more things getting run in parallel. 
 ## Submission via GitHub
 Delete your project's current **README.md** file (the one you're reading right now) and include your report as a new **README.md** file in the project root directory. Have no fear—the README with the project description is always available for reading in the template repository you created your repository from. For more information on READMEs, feel free to visit [this page](https://docs.github.com/en/github/creating-cloning-and-archiving-repositories/about-readmes) in the GitHub Docs. You'll be writing in [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown). Be sure that your repository is up to date and you have pushed all changes you've made to the project's code. When you're ready to submit, simply provide the link to your repository in the Canvas assignment's submission.
 
