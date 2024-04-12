@@ -1,4 +1,8 @@
 # Large Scale Data Processing: Project 3
+
+George Arianas
+Nathan French
+
 ## Getting started
 Head to [Project 1](https://github.com/CSCI3390Spring2024/project_1) if you're looking for information on Git, template repositories, or setting up your local/remote environments.
 
@@ -67,7 +71,7 @@ b. Run `LubyMIS` on `twitter_original_edges.csv` with 4x2 cores and then 2x2 cor
 
 |             Graph file             |   Iterations   |  Seconds  |
 | ---------------------------------- | -------------- | --------- |
-| twitter_original_edges.csv         |       1        |       |
+| twitter_original_edges.csv         |       1        |    258    |
 
 
 2x2 cores:
