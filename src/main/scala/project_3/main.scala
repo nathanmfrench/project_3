@@ -16,10 +16,63 @@ object main{
   Logger.getLogger("org.apache.spark").setLevel(Level.WARN)
   Logger.getLogger("org.spark-project").setLevel(Level.WARN)
 
+  case class VertexProperties(id: Long, degree: Int, value: Double, active: String, inMIS: String)
+
   def LubyMIS(g_in: Graph[Int, Int]): Graph[Int, Int] = {
-    while (remaining_vertices >= 1) {
-        // To Implement
+    var misSet = Set[Long]()
+    val vertexDegrees = g_in.degrees
+    var activeGraph = g_in.outerJoinVertices(vertexDegrees) {
+      case (_, _, degreeOpt) => VertexProperties(-1, degreeOpt.getOrElse(0), -0.1, "active", "No")
+    }.cache()
+
+    var iterationCount = 0
+    while (activeGraph.vertices.filter { case (_, vp) => vp.active == "active" }.count() > 0) {
+      activeGraph = activeGraph.mapVertices { case (_, vp) =>
+        if (vp.active == "active")
+          VertexProperties(vp.id, vp.degree, scala.util.Random.nextDouble(), vp.active, vp.inMIS)
+        else
+          vp
+      }
+
+      val maxNeighborValue: VertexRDD[VertexProperties] = activeGraph.aggregateMessages[VertexProperties](
+        triplet => {
+          triplet.sendToDst(triplet.srcAttr)
+          triplet.sendToSrc(triplet.dstAttr)
+        },
+        (vp1, vp2) => if (vp1.value > vp2.value) vp1 else vp2
+      )
+
+      val candidates = activeGraph.vertices.join(maxNeighborValue)
+        .filter { case (_, (vp, highest)) => vp.active == "active" && vp.value > highest.value }
+
+      val newMISVertices = candidates.map(_._1).collect().toSet
+      misSet ++= newMISVertices
+
+      activeGraph = activeGraph.mapVertices { case (id, vp) =>
+        if (newMISVertices.contains(id))
+          VertexProperties(vp.id, vp.degree, -0.1, "inactive", "Yes")
+        else if (misSet.contains(id) || misSet.exists(newMISVertices.contains))
+          VertexProperties(vp.id, vp.degree, -0.1, "inactive", "No")
+        else
+          vp
+      }.cache()
+
+      println(s"\tNumber of active vertices remaining: ${activeGraph.vertices.filter { case (_, vp) => vp.active == "active" }.count()}")
+      iterationCount += 1
     }
+    println(s"Total iterations: $iterationCount")
+
+    val finalVertices = activeGraph.vertices
+      .map { case (id, vp) => (id, if (vp.inMIS == "Yes") 1 else -1) }
+      .cache() // Make sure it's materialized and cached before usage
+
+    // Use join to combine the properties instead of lookup inside mapVertices
+    val finalGraph = g_in.outerJoinVertices(finalVertices) {
+      case (id, _, optProp) => optProp.getOrElse(-1)
+    }
+
+    return finalGraph
+
   }
 
 
@@ -73,6 +126,7 @@ object main{
       sys.exit(1)
     }
     if(args(0)=="compute") {
+      println("Luby")
       if(args.length != 3) {
         println("Usage: project_3 compute graph_path output_path")
         sys.exit(1)
@@ -92,6 +146,7 @@ object main{
       g2df.coalesce(1).write.format("csv").mode("overwrite").save(args(2))
     }
     else if(args(0)=="verify") {
+      println("VERIFY")
       if(args.length != 3) {
         println("Usage: project_3 verify graph_path MIS_path")
         sys.exit(1)
@@ -103,9 +158,9 @@ object main{
 
       val ans = verifyMIS(g)
       if(ans)
-        println("Yes")
+        println("YES the graph is an MIS AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
       else
-        println("No")
+        println("NO the graph is not an MIS AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
     }
     else
     {
